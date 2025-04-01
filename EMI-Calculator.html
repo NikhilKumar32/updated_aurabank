@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loans - EMI Calculator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f8fb;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(90deg, #0d47a1, #1976d2);
+      color: white;
+      padding: 10px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: slideDown 0.5s ease-in-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+      }
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      height: 40px;
+      width: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .logo h1 {
+      font-size: 20px;
+      margin-left: 10px;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 15px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .nav-links li a {
+      text-decoration: none;
+      color: white;
+      font-size: 14px;
+      padding: 5px 10px;
+      transition: color 0.3s;
+    }
+
+    .nav-links li a:hover {
+      color: #ff9800;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .auth-buttons button {
+      border: none;
+      padding: 8px 15px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 5px;
+      background: linear-gradient(90deg, #ff9800, #f57c00);
+      color: white;
+      transition: transform 0.3s;
+    }
+
+    .auth-buttons button:hover {
+      background: linear-gradient(90deg, #f57c00, #ff6f00);
+      transform: scale(1.1);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      animation: slideIn 20s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .auth-buttons {
+      margin-left: auto;
+      display: flex;
+      gap: 10px;
+    }
+
+    .auth-buttons a {
+      text-decoration: none;
+      padding: 8px 12px;
+      background: white;
+      color: #1976d2;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    /* Content Section */
+    .content {
+      display: flex;
+      padding: 40px;
+      gap: 30px;
+    }
+
+    .loan-options {
+      width: 40%;
+    }
+
+    .loan-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .loan-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .loan-calculator {
+      width: 60%;
+      background: linear-gradient(135deg, #ffecb3, #ffcc80);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .calculator-title {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .input-group input[type="range"] {
+      width: 100%;
+    }
+
+    .slider-value {
+      font-size: 14px;
+      color: #333;
+      text-align: right;
+    }
+
+    .calculate-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #ff9800;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+
+    .calculate-btn:hover {
+      background: #f57c00;
+    }
+
+    .result {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .breakdown {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+    }
+
+    .breakdown div {
+      text-align: center;
+    }
+
+    #chart-container {
+      width: 100%;
+      max-width: 400px;
+      margin: 20px auto;
+    }
+
+    /* Footer */
+    footer {
+      background: #0d47a1;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .social-icons a {
+      margin: 0 10px;
+      color: white;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <img src="https://i.imgur.com/1YmW2rK.png" alt="Bank Logo">
+    <h1>Aura Bank</h1>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="accounts.html">Accounts</a></li>
+    <li><a href="loans.html">Loans</a></li>
+    <li><a href="transactions.html">Transactions</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="EMI-Calculator.html">EMI Calculator</a>
+  </ul>
+  <div class="auth-buttons">
+    <button onclick="window.location.href='login.html'">Login</button>
+    <button onclick="window.location.href='signup.html'">Sign Up</button>
+  </div>
+</header>
+
+<main>
+  <section class="content">
+    <div class="loan-options">
+      <div class="loan-card" onclick="selectLoanType('Home Loan', 6.5)">
+        <h3>Home Loan</h3>
+        <p>Low-interest rates for your dream home.</p>
+        <p>Interest Rate: 6.5% p.a.</p>
+      </div>
+      <div class="loan-card" onclick="selectLoanType('Education Loan', 8.5)">
+        <h3>Education Loan</h3>
+        <p>For career-focused courses such as medicine, engineering, and management.</p>
+        <p>Interest Rate: 8.5% p.a.</p>
+      </div>
+      <div class="loan-card" onclick="selectLoanType('Personal Loan', 10.5)">
+        <h3>Personal Loan</h3>
+        <p>Flexible terms for your personal needs.</p>
+        <p>Interest Rate: 10.5% p.a.</p>
+      </div>
+    </div>
+
+    <div class="loan-calculator">
+      <h2 class="calculator-title">Loan EMI Calculator</h2>
+      <div class="input-group">
+        <label for="loan-amount">Loan Amount (₹): Ranging from 3 Lakhs to 1 Crores</label>
+        <input type="range" id="loan-amount" min="300000" max="10000000" step="100000" value="1000000" oninput="updateSliderValue('loan-amount-value', this.value)">
+        <div class="slider-value" id="loan-amount-value">₹1,000,000</div>
+      </div>
+
+      <div class="input-group">
+        <label for="loan-tenure">Tenure (years): Choose between 1 to 30 years</label>
+        <input type="range" id="loan-tenure" min="1" max="30" step="1" value="10" oninput="updateSliderValue('loan-tenure-value', this.value)">
+        <div class="slider-value" id="loan-tenure-value">10 years</div>
+      </div>
+
+      <button class="calculate-btn" onclick="calculateEMI()">Calculate EMI</button>
+      <div id="emi-result" class="result"></div>
+      <div id="breakdown" class="breakdown"></div>
+      <div id="chart-container">
+        <canvas id="emi-chart"></canvas>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  let selectedInterestRate = 6.5;
+
+  function selectLoanType(type, interestRate) {
+    selectedInterestRate = interestRate;
+    document.querySelector('.calculator-title').innerText = `${type} EMI Calculator`;
+  }
+
+  function updateSliderValue(elementId, value) {
+    document.getElementById(elementId).innerText = elementId.includes('amount') ? `₹${Number(value).toLocaleString()}` : `${value} years`;
+  }
+
+  function calculateEMI() {
+    const loanAmount = document.getElementById('loan-amount').value;
+    const interestRate = selectedInterestRate / 100 / 12;
+    const tenure = document.getElementById('loan-tenure').value * 12;
+
+    const emi = (loanAmount * interestRate * Math.pow(1 + interestRate, tenure)) /
+                (Math.pow(1 + interestRate, tenure) - 1);
+
+    const totalPayment = emi * tenure;
+    const interestAmount = totalPayment - loanAmount;
+
+    document.getElementById('emi-result').innerText = `Your EMI: ₹${emi.toFixed(2)}`;
+
+    document.getElementById('breakdown').innerHTML = `
+      <div>
+        <strong>Total Payment</strong>
+        <p>₹${totalPayment.toFixed(2)}</p>
+      </div>
+      <div>
+        <strong>Principal Amount</strong>
+        <p>₹${Number(loanAmount).toFixed(2)}</p>
+      </div>
+      <div>
+        <strong>Interest Amount</strong>
+        <p>₹${interestAmount.toFixed(2)}</p>
+      </div>
+    `;
+
+    renderChart(loanAmount, interestAmount);
+  }
+
+  function renderChart(principal, interest) {
+    const ctx = document.getElementById('emi-chart').getContext('2d');
+    if (window.emiChart) window.emiChart.destroy();
+    window.emiChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Principal Amount', 'Interest Amount'],
+        datasets: [{
+          data: [principal, interest],
+          backgroundColor: ['#42a5f5', '#ff7043']
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          }
+        }
+      }
+    });
+  }
+</script>
+
+<footer>
+    <p>&copy; 2025 Aura Bank. All Rights Reserved by Nikhil Kumar.</p>
+    <div class="social-icons">
+      <a href="https://www.linkedin.com/in/nikhil-kumar-tech" target="_blank"><i class="fab fa-linkedin"></i></a>
+      <a href="https://www.github.com/NikhilKumar32" target="_blank"><i class="fab fa-github"></i></a>
+    </div>
+  </footer>
+
+</body>
+</html>
